@@ -736,5 +736,66 @@ namespace Dapper.BaseRepository.Components
             Debug.WriteLine($"Successfully ran query from function: {callerMemberName}");
             return Task.FromResult(resp ?? Enumerable.Empty<TResult>());
         }
+
+        public Task<TResult> RunStoredProcedure<TParam, TResult>(string storedProcedureName, TParam paramObject,
+            [CallerMemberName] string callerMemberName = "")
+        {
+
+            var dynamicParameters = new DynamicParameters();
+
+            if (paramObject != null)
+                dynamicParameters = BaseUtility.CreateDynamicParameter(paramObject);
+
+            if (string.IsNullOrWhiteSpace(ConnectionStrings.SqlServerConnection))
+                throw new NullReferenceException("ConnectionStrings.SqlServerConnection is null, please set a default value for sqlserver connection.");
+            Debug.WriteLine($"Calling {storedProcedureName} procedure from function: {callerMemberName} ");
+            dbExecutor.ExecuteCommandProc(storedProcedureName, ConnectionStrings.SqlServerConnection, dynamicParameters);
+            return Task.FromResult(BaseUtility.GetStoredProcedureResult<TResult>(dynamicParameters));
+        }
+
+        /// <summary>
+        /// Runs a stored procedure on a sql server database.
+        /// </summary>
+        /// <typeparam name="TParam">The type of the object containing the stored procedure parameters including input, output and return parameters.</typeparam>
+        /// <typeparam name="TResult">The type of the object containing the result returned from the stored procedure including output and return parameters. </typeparam>
+        /// <param name="storedProcedureName">The name of the stored procedure</param>
+        /// <param name="paramObject">An object containing input , output and return parameters of the stored procedure.</param>
+        /// <param name="dbType">The database type.</param>
+        /// <param name="callerMemberName">The name of the calling function. (used for logging)</param>
+        /// <returns></returns>
+        public Task<TResult> RunStoredProcedure<TParam, TResult>(string storedProcedureName, TParam paramObject, DbType dbType,
+             [CallerMemberName] string callerMemberName = "")
+        {
+            var dynamicParameters = new DynamicParameters();
+
+            if (paramObject != null)
+                dynamicParameters = BaseUtility.CreateDynamicParameter(paramObject);
+
+            var connectionString = BaseUtility.GetConnectionString(string.Empty, dbType);
+            Debug.WriteLine($"Calling stored procedure {storedProcedureName} from function:{callerMemberName}");
+            switch (dbType)
+            {
+                case DbType.SqlServer:
+                    dbExecutor.ExecuteCommandProc(storedProcedureName, connectionString, dynamicParameters);
+                    break;
+                case DbType.Sybase:
+                    dbExecutor.ExecuteSybaseCommandProc(storedProcedureName, connectionString, dynamicParameters);
+                    break;
+                case DbType.Oracle:
+                    dbExecutor.ExecuteOracleCommandProc(storedProcedureName, connectionString, dynamicParameters);
+                    break;
+            }
+            return Task.FromResult(BaseUtility.GetStoredProcedureResult<TResult>(dynamicParameters)); return Task.FromResult(Activator.CreateInstance<TResult>());
+
+        }
+
+        public Task<decimal?> RunScalar(string query, [CallerMemberName] string callerMemberName = "")
+        {
+            Debug.WriteLine($"Sending query from  function: {callerMemberName}...");
+            decimal? resp = (decimal)dbExecutor.QueryScalar(query, ConnectionStrings.SqlServerConnection, new { }); ;
+
+            Debug.WriteLine($"Successfully ran query from function: {callerMemberName}");
+            return Task.FromResult(resp);
+        }
     }
 }
