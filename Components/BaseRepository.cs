@@ -184,10 +184,10 @@
                     resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, new { });
                     break;
                 case DbType.Sybase:
-                    resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, new { });
+                    resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SybaseConnection, new { });
                     break;
                 case DbType.Oracle:
-                    resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, new { });
+                    resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.OracleConnection, new { });
                     break;
             }
             //logger.LogInformation($"Successfully ran query from function: {callerMemberName}");
@@ -207,10 +207,10 @@
                     resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, queryParam);
                     break;
                 case DbType.Sybase:
-                    resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, queryParam);
+                    resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SybaseConnection, queryParam);
                     break;
                 case DbType.Oracle:
-                    resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, queryParam);
+                    resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.OracleConnection, queryParam);
                     break;
             }
             //logger.LogInformation($"Successfully ran query from function: {callerMemberName}");
@@ -581,10 +581,10 @@
                         resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, new { });
                         break;
                     case DbType.Sybase:
-                        resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, new { });
+                        resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SybaseConnection, new { });
                         break;
                     case DbType.Oracle:
-                        resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, new { });
+                        resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.OracleConnection, new { });
                         break;
                 }
                 logger.LogInformation($"Successfully ran query from function: {callerMemberName}");
@@ -612,10 +612,10 @@
                         resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, queryParam);
                         break;
                     case DbType.Sybase:
-                        resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, queryParam);
+                        resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SybaseConnection, queryParam);
                         break;
                     case DbType.Oracle:
-                        resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, queryParam);
+                        resp = DapperOrmExecutor.Query<TResult>(sqlQuery, ConnectionStrings.OracleConnection, queryParam);
                         break;
                 }
                 logger.LogInformation($"Successfully ran query from function: {callerMemberName}");
