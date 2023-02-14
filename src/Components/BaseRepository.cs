@@ -58,7 +58,7 @@ namespace Dapper.BaseRepository.Components
         {
             try
             {
-                if (queryParam.GetType() == typeof(string))
+                if (queryParam.GetType() == typeof(string) || queryParam.GetType().IsValueType)
                     throw new ArgumentException("queryParam must be an object containing the sqlCommand queryParam parameters");
 
                 dbExecutor.ExecuteCommand(sqlCommand, BaseUtility.GetConnectionString(string.Empty, DbType.SqlServer), queryParam);

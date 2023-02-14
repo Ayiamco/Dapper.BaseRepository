@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("DapperBaseRepo.Tests")]
 namespace Dapper.BaseRepository.Config
 {
     internal static class ConnectionStrings
