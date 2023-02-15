@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Dapper.BaseRepository.Components;
+using Dapper.BaseRepository.interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("DapperBaseRepo.Tests")]
@@ -50,6 +52,7 @@ namespace Dapper.BaseRepository.Config
             ConnectionStrings.SybaseConnection = connectionStringOptions.DefaultSybaseConnectionString;
             ConnectionStrings.OracleConnection = connectionStringOptions.DefaultsOracleConnectionString;
             ConnectionStrings.ThrowErrors = connectionStringOptions.ThrowErrors;
+            services.AddScoped<IDbExecutor, DapperOrmExecutor>();
             return services;
         }
     }
