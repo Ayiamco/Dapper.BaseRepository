@@ -11,7 +11,7 @@ namespace DapperBaseRepo.Tests
         protected readonly MockBaseRepository baseRepo;
         protected readonly Mock<IRepositoryLogger<MockBaseRepository>> loggerMock;
         protected readonly Mock<IDbExecutor> dbExecutorMock;
-        protected readonly string dummySqlString = "Select * from dummyTable";
+        protected readonly string dummySqlCommand = "Delete * from table";
         public BaseTestComponent()
         {
             ConnectionStrings.SybaseConnection = "SybaseConnectionTestString";

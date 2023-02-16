@@ -153,8 +153,8 @@ namespace Dapper.BaseRepository.Components
         /// <param name="connectionString">db connection string.</param>
         /// <param name="queryParam">queryParam parameters for the sql command.</param>
         /// <returns></returns>
-        public Task<CommandResp> RunCommand(string sqlCommand, object queryParam,
-            DbType commandType, string connectionString, [CallerMemberName] string callerMemberName = "")
+        public Task<CommandResp> RunCommand(string sqlCommand, object queryParam, string connectionString,
+            DbType commandType, [CallerMemberName] string callerMemberName = "")
         {
             try
             {
