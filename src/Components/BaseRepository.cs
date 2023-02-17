@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace Dapper.BaseRepository.Components
 {
     /// <summary>
-    /// Base repository supported db types.
+    /// <see cref="BaseRepository"/> supported databases.
     /// </summary>
     public enum DbType
     {
@@ -83,8 +83,8 @@ namespace Dapper.BaseRepository.Components
         /// <param name="connectionString">db connection string.</param>
         /// <param name="queryParam">queryParam parameters for the sql command.</param>
         /// <returns></returns>
-        public Task<CommandResp> RunCommand(string sqlCommand, object queryParam,
-            string connectionString, [CallerMemberName] string callerMemberName = "")
+        public Task<CommandResp> RunCommand(string sqlCommand,
+            string connectionString, object queryParam, [CallerMemberName] string callerMemberName = "")
         {
             try
             {

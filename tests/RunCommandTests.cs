@@ -70,5 +70,22 @@ namespace DapperBaseRepo.Tests
             Assert.Equal(CommandResp.Success, resp2);
             Assert.Equal(CommandResp.Success, resp3);
         }
+
+        [Fact]
+        public async Task ShouldLogFailures_WhenErrorsOccurs()
+        {
+            //Arrange
+            dbExecutorMock.Setup(x => x.ExecuteCommand(It.IsAny<string>(), ConnectionStrings.SqlServerConnection, new { })).
+                Throws(new Exception("Exception happened"));
+
+            //Act
+            var resp = await baseRepo.RunCommand(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { });
+
+            //Assert
+            dbExecutorMock.Verify(x => x.ExecuteCommand(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { }), Times.Once);
+            loggerMock.Verify(x => x.LogError(It.IsAny<string>()));
+        }
+
+        //should return failure
     }
 }
