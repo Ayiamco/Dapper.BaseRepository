@@ -30,4 +30,6 @@ namespace DapperBaseRepo.Tests
         {
         }
     }
+
+    public class TestObject { }
 }

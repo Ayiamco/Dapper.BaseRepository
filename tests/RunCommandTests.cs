@@ -116,5 +116,7 @@ namespace DapperBaseRepo.Tests
             loggerMock.Verify(x => x.LogError(It.IsAny<string>()));
             Assert.Equal(CommandResp.Failure, resp);
         }
+
+        //should log error when default connection is empty sql,oracle and sybase
     }
 }
