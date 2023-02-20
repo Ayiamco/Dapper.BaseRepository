@@ -24,5 +24,22 @@ namespace DapperBaseRepo.Tests
             //Assert
             Assert.Equal(resp, testQueryResult);
         }
+
+        [Fact]
+        public async Task ShouldReturnEmptyEnumerable_WhenErrorOccurs()
+        {
+            //Arrange
+            dbExecutorMock.Setup(x => x.Query<TestObject>(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { }))
+            .Throws(new Exception("error occured"));
+
+            //Act
+            var resp = await baseRepo.RunQuery<TestObject>(dummySqlCommand, new { });
+
+            //Assert
+            Assert.Equal(resp, Enumerable.Empty<TestObject>());
+        }
+
+        //should log error
+        //should log successful query
     }
 }
