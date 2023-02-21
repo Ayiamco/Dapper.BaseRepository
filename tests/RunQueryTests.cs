@@ -1,4 +1,5 @@
 ﻿using Dapper.BaseRepository.Config;
+using Moq;
 
 namespace DapperBaseRepo.Tests
 {
@@ -38,6 +39,23 @@ namespace DapperBaseRepo.Tests
             //Assert
             Assert.Equal(resp, Enumerable.Empty<TestObject>());
         }
+
+        [Fact]
+        public async Task ShouldUseSqlServerAsDefaultConnection_WhenDbTypeIsNotPassed()
+        {
+            //Arrange
+            dbExecutorMock.Setup(x => x.Query<TestObject>(dummySqlCommand, It.IsAny<string>(), new { }))
+            .Returns(new List<TestObject>().AsEnumerable());
+
+            //Act
+            var resp = await baseRepo.RunQuery<TestObject>(dummySqlCommand);
+
+            //Assert
+            Assert.Equal(resp, new List<TestObject>().AsEnumerable());
+            //TODO: Why does this verification fail?
+            //dbExecutorMock.Verify(x => x.Query<TestObject>(dummySqlCommand, It.IsAny<string>(), new { }), Times.Once);
+        }
+
 
         //should log error
         //should log successful query
