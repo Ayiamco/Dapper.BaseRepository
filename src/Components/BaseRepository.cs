@@ -1,6 +1,7 @@
 ﻿using Dapper.BaseRepository.Config;
 using Dapper.BaseRepository.interfaces;
 using Dapper.Repository.interfaces;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace Dapper.BaseRepository.Components
@@ -21,7 +22,7 @@ namespace Dapper.BaseRepository.Components
         private readonly IDbExecutor dbExecutor;
         private readonly Dictionary<DbType, Func<string, string, object?, int>> CommandsMap;
 
-        public BaseRepository(IRepositoryLogger<TRepo> logger, IDbExecutor dbExecutor)
+        internal BaseRepository(IRepositoryLogger<TRepo> logger, IDbExecutor dbExecutor)
         {
             this.logger = logger;
             this.dbExecutor = dbExecutor;
@@ -33,7 +34,6 @@ namespace Dapper.BaseRepository.Components
             };
         }
 
-        [Obsolete]
         public BaseRepository(IRepositoryLogger<TRepo> logger)
         {
             this.logger = logger;
@@ -59,7 +59,7 @@ namespace Dapper.BaseRepository.Components
             try
             {
                 if (queryParam.GetType() == typeof(string) || queryParam.GetType().IsValueType)
-                    throw new ArgumentException("queryParam must be an object containing the sqlCommand queryParam parameters");
+                    throw new ArgumentException("queryParam must be an object containing the sqlCommand parameters");
 
                 dbExecutor.ExecuteCommand(sqlCommand, BaseUtility.GetConnectionString(string.Empty, DbType.SqlServer), queryParam);
                 logger.LogInformation($"Successfully ran command from function: {callerMemberName}");
@@ -89,7 +89,7 @@ namespace Dapper.BaseRepository.Components
             try
             {
                 if (queryParam is string)
-                    throw new ArgumentException("queryParam must be an object containing the sqlCommand queryParam parameters");
+                    throw new ArgumentException("queryParam must be an object containing the sqlCommand parameters");
 
                 connectionString = string.IsNullOrWhiteSpace(connectionString) ?
                     BaseUtility.GetConnectionString(connectionString, DbType.SqlServer) : connectionString;
@@ -129,7 +129,7 @@ namespace Dapper.BaseRepository.Components
                 };
 
                 if (queryParam.GetType() == typeof(string))
-                    throw new ArgumentException("queryParam must be an object containing the sqlCommand queryParam parameters");
+                    throw new ArgumentException("queryParam must be an object containing the sqlCommand parameters");
 
                 CommandsMap[commandType](sqlCommand, BaseUtility.GetConnectionString(string.Empty, map[commandType]), queryParam);
                 logger.LogInformation($"Successfully ran command from function: {callerMemberName}");
@@ -159,7 +159,7 @@ namespace Dapper.BaseRepository.Components
             try
             {
                 if (queryParam.GetType() == typeof(string))
-                    throw new ArgumentException("queryParam must be an object containing the sqlCommand queryParam parameters");
+                    throw new ArgumentException("queryParam must be an object containing the sqlCommand parameters");
 
                 var map = new Dictionary<DbType, DbType>
                 {
@@ -223,7 +223,10 @@ namespace Dapper.BaseRepository.Components
                 if (string.IsNullOrWhiteSpace(sqlQuery) || queryParam.GetType() == typeof(string))
                     throw new ArgumentException("sqlQuery cannot be empty and queryParam must be sqlQuery parameter object");
 
-                IEnumerable<TResult> resp = dbExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, queryParam);
+                if (string.IsNullOrWhiteSpace(ConnectionStrings.SqlServerConnection))
+                    throw new ArgumentException("DefaultSqlServerConnectionString was not set, please configure using ConnectionStringOptions or pass in connection string.");
+
+                IEnumerable<TResult> resp = dbExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection!, queryParam);
                 logger.LogInformation($"Successfully ran query from function: {callerMemberName}");
                 return Task.FromResult(resp);
             }
@@ -469,6 +472,75 @@ namespace Dapper.BaseRepository.Components
                 //TODO: Find a better return type for failure
                 return default;
             }
+        }
+    }
+
+
+    public abstract class BaseRepository<TRepo> where TRepo : class
+    {
+        private readonly IDbExecutor dbExecutor;
+        private readonly Dictionary<DbType, Func<string, string, object?, int>> CommandsMap;
+
+        internal BaseRepository(IDbExecutor dbExecutor)
+        {
+            this.dbExecutor = dbExecutor;
+            CommandsMap = new()
+            {
+                {DbType.Sybase, dbExecutor.ExecuteSybaseCommand },
+                {DbType.Oracle, dbExecutor.ExecuteOracleCommand },
+                {DbType.SqlServer, dbExecutor.ExecuteCommand},
+            };
+        }
+
+        public BaseRepository()
+        {
+            this.dbExecutor = new DapperOrmExecutor();
+            CommandsMap = new()
+            {
+                {DbType.Sybase, dbExecutor.ExecuteSybaseCommand },
+                {DbType.Oracle, dbExecutor.ExecuteOracleCommand },
+                {DbType.SqlServer, dbExecutor.ExecuteCommand},
+            };
+        }
+
+        /// <summary>
+        /// Executes a sql DDL/DML on a sql server database. The connectionString is gotten from
+        /// the DefaultConnection property on the <see cref="ConnectionStrings"/> property of the  <see cref="BaseAppConfig"/> configuration object.
+        /// </summary>
+        /// <param name="sqlCommand">sql statement</param>
+        /// <param name="queryParam">queryParam parameters for the sql command.</param>
+        /// <returns></returns>
+        public Task<CommandResp> RunCommand(string sqlCommand, object queryParam,
+             [CallerMemberName] string callerMemberName = "")
+        {
+            if (queryParam.GetType() == typeof(string) || queryParam.GetType().IsValueType)
+                throw new ArgumentException("queryParam must be an object containing the sqlCommand parameters");
+
+            dbExecutor.ExecuteCommand(sqlCommand, BaseUtility.GetConnectionString(string.Empty, DbType.SqlServer), queryParam);
+            Debug.WriteLine($"Successfully ran command from function: {callerMemberName}");
+            return Task.FromResult(CommandResp.Success);
+        }
+
+        /// <summary>
+        /// Executes a sql DDL/DML on a sql server database. If the connectionString is not specified 
+        /// the DefaultConnection property on the BaseAppConfig Connectionstring is used.
+        /// </summary>
+        /// <param name="sqlCommand">sql statement</param>
+        /// <param name="connectionString">db connection string.</param>
+        /// <param name="queryParam">queryParam parameters for the sql command.</param>
+        /// <returns></returns>
+        public Task<CommandResp> RunCommand(string sqlCommand,
+            string connectionString, object queryParam, [CallerMemberName] string callerMemberName = "")
+        {
+            if (queryParam is string)
+                throw new ArgumentException("queryParam must be an object containing the sqlCommand parameters");
+
+            connectionString = string.IsNullOrWhiteSpace(connectionString) ?
+                BaseUtility.GetConnectionString(connectionString, DbType.SqlServer) : connectionString;
+
+            dbExecutor.ExecuteCommand(sqlCommand, connectionString, queryParam);
+            Debug.WriteLine($"Successfully ran command from function: {callerMemberName}");
+            return Task.FromResult(CommandResp.Success);
         }
     }
 }
