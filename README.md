@@ -1,4 +1,5 @@
-```pulbic class {
+```
+pulbic class QueryParam {
 
 }
 ```
