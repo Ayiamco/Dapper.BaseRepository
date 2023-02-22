@@ -1,3 +1,4 @@
-''' pulbic class {
+```pulbic class {
 
-} '''
+}
+```
