@@ -542,5 +542,60 @@ namespace Dapper.BaseRepository.Components
             Debug.WriteLine($"Successfully ran command from function: {callerMemberName}");
             return Task.FromResult(CommandResp.Success);
         }
+
+        /// <summary>
+        /// Executes a sql DDL/DML on the specified database type. The connectionString is gotten from
+        /// the corresponding BaseAppConfig Connectionstring property.
+        /// </summary>
+        /// <param name="sqlCommand">sql statement</param>
+        /// <param name="connectionString">db connection string.</param>
+        /// <param name="queryParam">queryParam parameters for the sql command.</param>
+        /// <returns></returns>
+        public Task<CommandResp> RunCommand(string sqlCommand, object queryParam,
+            DbType commandType, [CallerMemberName] string callerMemberName = "")
+        {
+            var map = new Dictionary<DbType, DbType>
+                {
+                    { DbType.SqlServer, DbType.SqlServer },
+                    { DbType.Oracle, DbType.Oracle },
+                    { DbType.Sybase, DbType.Sybase },
+                };
+
+            if (queryParam.GetType() == typeof(string))
+                throw new ArgumentException("queryParam must be an object containing the sqlCommand parameters");
+
+            CommandsMap[commandType](sqlCommand, BaseUtility.GetConnectionString(string.Empty, map[commandType]), queryParam);
+            Debug.WriteLine($"Successfully ran command from function: {callerMemberName}");
+            return Task.FromResult(CommandResp.Success);
+        }
+
+        /// <summary>
+        /// Executes a sql DDL/DML on the specified database type. If the connectionString is not specified 
+        /// the corresponding BaseAppConfig Connectionstring property is used.
+        /// </summary>
+        /// <param name="sqlCommand">sql statement</param>
+        /// <param name="connectionString">db connection string.</param>
+        /// <param name="queryParam">queryParam parameters for the sql command.</param>
+        /// <returns></returns>
+        public Task<CommandResp> RunCommand(string sqlCommand, object queryParam, string connectionString,
+            DbType commandType, [CallerMemberName] string callerMemberName = "")
+        {
+            if (queryParam.GetType() == typeof(string))
+                throw new ArgumentException("queryParam must be an object containing the sqlCommand parameters");
+
+            var map = new Dictionary<DbType, DbType>
+                {
+                    { DbType.SqlServer, DbType.SqlServer },
+                    { DbType.Oracle, DbType.Oracle },
+                    { DbType.Sybase, DbType.Sybase },
+                };
+
+            connectionString = string.IsNullOrWhiteSpace(connectionString) ?
+                BaseUtility.GetConnectionString(connectionString, map[commandType]) : connectionString;
+            CommandsMap[commandType](sqlCommand, connectionString, queryParam);
+            Debug.WriteLine($"Successfully ran command from function: {callerMemberName}");
+            return Task.FromResult(CommandResp.Success);
+        }
+
     }
 }

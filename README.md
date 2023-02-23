@@ -1,5 +1,5 @@
 ```
-pulbic class QueryParam {
+public class QueryParam {
 
 }
 ```
