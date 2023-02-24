@@ -597,5 +597,28 @@ namespace Dapper.BaseRepository.Components
             return Task.FromResult(CommandResp.Success);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="sqlQuery"></param>
+        /// <param name="callerMemberName"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public Task<IEnumerable<TResult>> RunQuery<TResult>(string sqlQuery,
+            [CallerMemberName] string callerMemberName = "") where TResult : class
+        {
+            if (string.IsNullOrWhiteSpace(sqlQuery))
+                throw new ArgumentException("sqlQuery cannot be empty");
+
+            var conn = ConnectionStrings.SqlServerConnection;
+            if (string.IsNullOrWhiteSpace(conn))
+                throw new ArgumentNullException("SqlConnection string is null");
+
+            IEnumerable<TResult> resp = dbExecutor.Query<TResult>(sqlQuery, conn, new { });
+            Debug.WriteLine($"Successfully ran query from function: {callerMemberName}");
+            return Task.FromResult(resp);
+        }
+
     }
 }
