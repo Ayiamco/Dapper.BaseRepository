@@ -620,5 +620,30 @@ namespace Dapper.BaseRepository.Components
             return Task.FromResult(resp);
         }
 
+        public Task<IEnumerable<TResult>> RunQuery<TResult>(string sqlQuery, object queryParam,
+            [CallerMemberName] string callerMemberName = "") where TResult : class
+        {
+            if (string.IsNullOrWhiteSpace(sqlQuery) || queryParam.GetType() == typeof(string))
+                throw new ArgumentException("sqlQuery cannot be empty and queryParam must be sqlQuery parameter object");
+
+            if (string.IsNullOrWhiteSpace(ConnectionStrings.SqlServerConnection))
+                throw new ArgumentException("DefaultSqlServerConnectionString was not set, please configure using ConnectionStringOptions or pass in connection string.");
+
+            IEnumerable<TResult> resp = dbExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection!, queryParam);
+            Debug.WriteLine($"Successfully ran query from function: {callerMemberName}");
+            return Task.FromResult(resp);
+        }
+
+        public Task<IEnumerable<TResult>> RunQuery<TResult>(string sqlQuery, object queryParam, string connectionString,
+            [CallerMemberName] string callerMemberName = "") where TResult : class
+        {
+            if (string.IsNullOrWhiteSpace(sqlQuery) || queryParam.GetType() == typeof(string))
+                throw new ArgumentException("sqlQuery cannot be empty and queryParam must be sqlQuery parameter object");
+
+            IEnumerable<TResult> resp = dbExecutor.Query<TResult>(sqlQuery, connectionString, queryParam);
+            Debug.WriteLine($"Successfully ran query from function: {callerMemberName}");
+            return Task.FromResult(resp);
+        }
+
     }
 }
