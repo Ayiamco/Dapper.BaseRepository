@@ -645,5 +645,28 @@ namespace Dapper.BaseRepository.Components
             return Task.FromResult(resp);
         }
 
+        public Task<IEnumerable<TResult>> RunQuery<TResult>(string sqlQuery,
+         DbType queryDbType, [CallerMemberName] string callerMemberName = "") where TResult : class
+        {
+            if (string.IsNullOrWhiteSpace(sqlQuery))
+                throw new ArgumentException("sqlQuery cannot be empty and queryParam must be sqlQuery parameter object");
+
+            IEnumerable<TResult> resp = null;
+            switch (queryDbType)
+            {
+                case DbType.SqlServer:
+                    resp = dbExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, new { });
+                    break;
+                case DbType.Sybase:
+                    resp = dbExecutor.QuerySybase<TResult>(sqlQuery, ConnectionStrings.SybaseConnection, new { });
+                    break;
+                case DbType.Oracle:
+                    resp = dbExecutor.QueryOracle<TResult>(sqlQuery, ConnectionStrings.OracleConnection, new { });
+                    break;
+            }
+            Debug.WriteLine($"Successfully ran query from function: {callerMemberName}");
+            return Task.FromResult(resp ?? Enumerable.Empty<TResult>());
+        }
+
     }
 }
