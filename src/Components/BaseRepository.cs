@@ -668,5 +668,51 @@ namespace Dapper.BaseRepository.Components
             return Task.FromResult(resp ?? Enumerable.Empty<TResult>());
         }
 
+        public Task<IEnumerable<TResult>> RunQuery<TResult>(string sqlQuery, object queryParam,
+           DbType queryDbType, [CallerMemberName] string callerMemberName = "") where TResult : class
+        {
+            if (string.IsNullOrWhiteSpace(sqlQuery) || queryParam.GetType() == typeof(string))
+                throw new ArgumentException("sqlQuery cannot be empty and queryParam must be sqlQuery parameter object");
+
+            IEnumerable<TResult> resp = null;
+            switch (queryDbType)
+            {
+                case DbType.SqlServer:
+                    resp = dbExecutor.Query<TResult>(sqlQuery, ConnectionStrings.SqlServerConnection, queryParam);
+                    break;
+                case DbType.Sybase:
+                    resp = dbExecutor.QuerySybase<TResult>(sqlQuery, ConnectionStrings.SybaseConnection, queryParam);
+                    break;
+                case DbType.Oracle:
+                    resp = dbExecutor.QueryOracle<TResult>(sqlQuery, ConnectionStrings.OracleConnection, queryParam);
+                    break;
+            }
+            Debug.WriteLine($"Successfully ran query from function: {callerMemberName}");
+            return Task.FromResult(resp ?? Enumerable.Empty<TResult>());
+        }
+
+        public Task<IEnumerable<TResult>> RunQuery<TResult>(string sqlQuery, string connectionString,
+           DbType queryDbType, [CallerMemberName] string callerMemberName = "") where TResult : class
+        {
+            if (string.IsNullOrWhiteSpace(sqlQuery))
+                throw new ArgumentException("sqlQuery cannot be empty.");
+
+            IEnumerable<TResult> resp = null;
+            switch (queryDbType)
+            {
+                case DbType.SqlServer:
+                    resp = dbExecutor.Query<TResult>(sqlQuery, connectionString, new { });
+                    break;
+                case DbType.Sybase:
+                    resp = dbExecutor.QuerySybase<TResult>(sqlQuery, connectionString, new { });
+                    break;
+                case DbType.Oracle:
+                    resp = dbExecutor.QueryOracle<TResult>(sqlQuery, connectionString, new { });
+                    break;
+            }
+            Debug.WriteLine($"Successfully ran query from function: {callerMemberName}");
+            return Task.FromResult(resp ?? Enumerable.Empty<TResult>());
+        }
+
     }
 }
