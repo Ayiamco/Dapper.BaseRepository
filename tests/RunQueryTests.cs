@@ -16,11 +16,11 @@ namespace DapperBaseRepo.Tests
         public async Task ShouldReturnRowsAsEnumerable_WhenQueryIsSuccessful()
         {
             //Arrange
-            dbExecutorMock.Setup(x => x.Query<TestObject>(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { }))
+            dbExecutorMock.Setup(x => x.Query<TestObject>(dummySqlCommand, ConnectionStrings.SqlServerConnection!, new { }))
             .Returns(testQueryResult);
 
             //Act
-            var resp = await baseRepo.RunQuery<TestObject>(dummySqlCommand, new { });
+            var resp = await repo.RunQuery<TestObject>(dummySqlCommand, new { });
 
             //Assert
             Assert.Equal(resp, testQueryResult);
@@ -30,11 +30,11 @@ namespace DapperBaseRepo.Tests
         public async Task ShouldReturnEmptyEnumerable_WhenErrorOccurs()
         {
             //Arrange
-            dbExecutorMock.Setup(x => x.Query<TestObject>(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { }))
+            dbExecutorMock.Setup(x => x.Query<TestObject>(dummySqlCommand, ConnectionStrings.SqlServerConnection!, new { }))
             .Throws(new Exception("error occured"));
 
             //Act
-            var resp = await baseRepo.RunQuery<TestObject>(dummySqlCommand, new { });
+            var resp = await repo.RunQuery<TestObject>(dummySqlCommand, new { });
 
             //Assert
             Assert.Equal(resp, Enumerable.Empty<TestObject>());
@@ -44,16 +44,16 @@ namespace DapperBaseRepo.Tests
         public async Task ShouldUseSqlServerAsDefaultConnection_WhenDbTypeIsNotPassed()
         {
             //Arrange
+
             dbExecutorMock.Setup(x => x.Query<TestObject>(dummySqlCommand, It.IsAny<string>(), new { }))
             .Returns(new List<TestObject>().AsEnumerable());
 
             //Act
-            var resp = await baseRepo.RunQuery<TestObject>(dummySqlCommand);
+            var resp = await repo.RunQuery<TestObject>(dummySqlCommand);
 
             //Assert
             Assert.Equal(resp, new List<TestObject>().AsEnumerable());
-            //TODO: Why does this verification fail?
-            //dbExecutorMock.Verify(x => x.Query<TestObject>(dummySqlCommand, It.IsAny<string>(), new { }), Times.Once);
+            dbExecutorMock.Verify(x => x.Query<TestObject>(dummySqlCommand, ConnectionStrings.SqlServerConnection!, It.IsAny<object>()), Times.Once);
         }
 
 

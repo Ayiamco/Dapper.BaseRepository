@@ -10,7 +10,7 @@ namespace DapperBaseRepo.Tests
         public async Task ShouldExecuteOnSqlServer_WhenNoDbTypeIsSpecified()
         {
             //Act
-            var resp = await baseRepo.RunCommand(dummySqlCommand, new { });
+            var resp = await repo.RunCommand(dummySqlCommand, new { });
 
             //Assert
             dbExecutorMock.Verify(x => x.ExecuteCommand(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { }), Times.Once);
@@ -22,7 +22,7 @@ namespace DapperBaseRepo.Tests
         public async Task ShouldCallSybase_WhenDbTypeIsSybase()
         {
             //Act
-            var resp = await baseRepo.RunCommand(dummySqlCommand, new { }, DbType.Sybase);
+            var resp = await repo.RunCommand(dummySqlCommand, new { }, DbType.Sybase);
 
             //Assert
             dbExecutorMock.Verify(x => x.ExecuteSybaseCommand(dummySqlCommand, ConnectionStrings.SybaseConnection, new { }), Times.Once);
@@ -35,7 +35,7 @@ namespace DapperBaseRepo.Tests
         public async Task ShouldCallSqlServer_WhenDbTypeIsSqlServer()
         {
             //Act
-            var resp = await baseRepo.RunCommand(dummySqlCommand, new { }, DbType.SqlServer);
+            var resp = await repo.RunCommand(dummySqlCommand, new { }, DbType.SqlServer);
 
             //Assert
             dbExecutorMock.Verify(x => x.ExecuteCommand(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { }), Times.Once);
@@ -50,7 +50,7 @@ namespace DapperBaseRepo.Tests
         public async Task ShouldCallOracle_WhenDbTypeIsOracle()
         {
             //Act
-            var resp = await baseRepo.RunCommand(dummySqlCommand, new { }, DbType.Oracle);
+            var resp = await repo.RunCommand(dummySqlCommand, new { }, DbType.Oracle);
 
             //Assert
             dbExecutorMock.Verify(x => x.ExecuteSybaseCommand(dummySqlCommand, ConnectionStrings.SybaseConnection, new { }), Times.Never);
@@ -69,9 +69,9 @@ namespace DapperBaseRepo.Tests
             var oracleConnString = "oracleConnString";
 
             //Act
-            var sybaseResp = await baseRepo.RunCommand(dummySqlCommand, new { }, sybaseConnString, DbType.Sybase);
-            var sqlServerResp = await baseRepo.RunCommand(dummySqlCommand, new { }, sqlServerConnString, DbType.SqlServer);
-            var oracleServerResp = await baseRepo.RunCommand(dummySqlCommand, new { }, oracleConnString, DbType.Oracle);
+            var sybaseResp = await repo.RunCommand(dummySqlCommand, new { }, sybaseConnString, DbType.Sybase);
+            var sqlServerResp = await repo.RunCommand(dummySqlCommand, new { }, sqlServerConnString, DbType.SqlServer);
+            var oracleServerResp = await repo.RunCommand(dummySqlCommand, new { }, oracleConnString, DbType.Oracle);
 
             //Assert
             dbExecutorMock.Verify(x => x.ExecuteSybaseCommand(dummySqlCommand, ConnectionStrings.SybaseConnection, new { }), Times.Never);
@@ -94,7 +94,7 @@ namespace DapperBaseRepo.Tests
                 Throws(new Exception("Exception happened"));
 
             //Act
-            var resp = await baseRepo.RunCommand(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { });
+            var resp = await repo.RunCommand(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { });
 
             //Assert
             dbExecutorMock.Verify(x => x.ExecuteCommand(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { }), Times.Once);
@@ -109,7 +109,7 @@ namespace DapperBaseRepo.Tests
                 Throws(new Exception("Exception happened"));
 
             //Act
-            var resp = await baseRepo.RunCommand(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { });
+            var resp = await repo.RunCommand(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { });
 
             //Assert
             dbExecutorMock.Verify(x => x.ExecuteCommand(dummySqlCommand, ConnectionStrings.SqlServerConnection, new { }), Times.Once);

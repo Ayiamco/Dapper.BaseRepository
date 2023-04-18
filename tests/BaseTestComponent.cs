@@ -6,10 +6,10 @@ using Moq;
 
 namespace DapperBaseRepo.Tests
 {
-    public class BaseTestComponent
+    public class BaseTestComponent : IDisposable
     {
-        protected readonly MockBaseRepository baseRepo;
-        protected readonly Mock<IRepositoryLogger<MockBaseRepository>> loggerMock;
+        protected readonly Repository repo;
+        protected readonly Mock<IRepositoryLogger<Repository>> loggerMock;
         protected readonly Mock<IDbExecutor> dbExecutorMock;
         protected readonly string dummySqlCommand = "Delete * from table";
         public BaseTestComponent()
@@ -18,15 +18,21 @@ namespace DapperBaseRepo.Tests
             ConnectionStrings.SqlServerConnection = "SqlServerConnectionTestString";
             ConnectionStrings.OracleConnection = "OracleConnectionTestString";
 
-            loggerMock = new Mock<IRepositoryLogger<MockBaseRepository>>();
+            loggerMock = new Mock<IRepositoryLogger<Repository>>();
             dbExecutorMock = new Mock<IDbExecutor>();
-            baseRepo = new MockBaseRepository(loggerMock.Object, dbExecutorMock.Object);
+            repo = new Repository(loggerMock.Object, dbExecutorMock.Object);
+        }
+
+        public void Dispose()
+        {
+            loggerMock.Reset();
+            dbExecutorMock.Reset();
         }
     }
 
-    public class MockBaseRepository : BaseRepository<MockBaseRepository, IRepositoryLogger<MockBaseRepository>>
+    public class Repository : BaseRepository<Repository, IRepositoryLogger<Repository>>
     {
-        public MockBaseRepository(IRepositoryLogger<MockBaseRepository> logger, IDbExecutor dbExecutor) : base(logger, dbExecutor)
+        public Repository(IRepositoryLogger<Repository> logger, IDbExecutor dbExecutor) : base(logger, dbExecutor)
         {
         }
     }
