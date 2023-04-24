@@ -455,12 +455,57 @@ namespace Dapper.BaseRepository.Components
             }
         }
 
+        [Obsolete]
         public Task<decimal?> RunScalar(string query, [CallerMemberName] string callerMemberName = "")
         {
             try
             {
                 logger.LogInformation($"Sending query from  function: {callerMemberName}...");
                 decimal? resp = (decimal)dbExecutor.QueryScalar(query, ConnectionStrings.SqlServerConnection, new { }); ;
+
+                logger.LogInformation($"Successfully ran query from function: {callerMemberName}");
+                return Task.FromResult(resp);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(BaseUtility.GetLogMessage(callerMemberName, ex));
+
+                //TODO: Find a better return type for failure
+                return default;
+            }
+        }
+
+        public Task<T>? RunScalar<T>(string query, [CallerMemberName] string callerMemberName = "")
+        {
+            try
+            {
+                logger.LogInformation($"Sending query from  function: {callerMemberName}...");
+                object? returnObj = dbExecutor.QueryScalar(query, ConnectionStrings.SqlServerConnection, new { });
+                if (returnObj is null) return null;
+
+                T resp = (T)returnObj;
+
+                logger.LogInformation($"Successfully ran query from function: {callerMemberName}");
+                return Task.FromResult(resp);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(BaseUtility.GetLogMessage(callerMemberName, ex));
+
+                //TODO: Find a better return type for failure
+                return default;
+            }
+        }
+
+        public Task<T>? RunScalar<T>(string query, object queryParams, [CallerMemberName] string callerMemberName = "")
+        {
+            try
+            {
+                logger.LogInformation($"Sending query from  function: {callerMemberName}...");
+                object? returnObj = dbExecutor.QueryScalar(query, ConnectionStrings.SqlServerConnection, queryParams);
+                if (returnObj is null) return null;
+
+                T resp = (T)returnObj;
 
                 logger.LogInformation($"Successfully ran query from function: {callerMemberName}");
                 return Task.FromResult(resp);
@@ -796,6 +841,50 @@ namespace Dapper.BaseRepository.Components
 
             Debug.WriteLine($"Successfully ran query from function: {callerMemberName}");
             return Task.FromResult(resp);
+        }
+
+        public Task<T>? RunScalar<T>(string query, [CallerMemberName] string callerMemberName = "")
+        {
+            try
+            {
+                Debug.WriteLine($"Sending query from  function: {callerMemberName}...");
+                object? returnObj = dbExecutor.QueryScalar(query, ConnectionStrings.SqlServerConnection, new { });
+                if (returnObj is null) return null;
+
+                T resp = (T)returnObj;
+
+                Debug.WriteLine($"Successfully ran query from function: {callerMemberName}");
+                return Task.FromResult(resp);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(BaseUtility.GetLogMessage(callerMemberName, ex));
+
+                //TODO: Find a better return type for failure
+                return default;
+            }
+        }
+
+        public Task<T>? RunScalar<T>(string query, object queryParams, [CallerMemberName] string callerMemberName = "")
+        {
+            try
+            {
+                Debug.WriteLine($"Sending query from  function: {callerMemberName}...");
+                object? returnObj = dbExecutor.QueryScalar(query, ConnectionStrings.SqlServerConnection, queryParams);
+                if (returnObj is null) return null;
+
+                T resp = (T)returnObj;
+
+                Debug.WriteLine($"Successfully ran query from function: {callerMemberName}");
+                return Task.FromResult(resp);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(BaseUtility.GetLogMessage(callerMemberName, ex));
+
+                //TODO: Find a better return type for failure
+                return default;
+            }
         }
     }
 }

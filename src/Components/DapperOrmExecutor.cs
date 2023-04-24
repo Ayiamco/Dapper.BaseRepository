@@ -58,15 +58,15 @@ namespace Dapper.BaseRepository.Components
             }
         }
 
-        public object QueryScalar(string procedureName, string connString, object? param = default)
+        public object QueryScalar(string sql, string connString, object? param = default)
         {
             using (SqlConnection conn = new SqlConnection(connString))
             {
                 conn.Open();
                 if (param == default)
-                    return conn.ExecuteScalar(procedureName, commandType: CommandType.Text);
+                    return conn.ExecuteScalar(sql, commandType: CommandType.Text);
 
-                return conn.ExecuteScalar(procedureName, param, commandType: CommandType.Text);
+                return conn.ExecuteScalar(sql, param, commandType: CommandType.Text);
             }
         }
         #endregion
@@ -120,6 +120,18 @@ namespace Dapper.BaseRepository.Components
                     return conn.Query<T>(procedureName, commandType: CommandType.StoredProcedure);
 
                 return conn.Query<T>(procedureName, param, commandType: CommandType.StoredProcedure);
+            }
+        }
+
+        public object QueryOracleScalar(string sql, string connString, object? param = default)
+        {
+            using (OracleConnection conn = new OracleConnection(connString))
+            {
+                conn.Open();
+                if (param == default)
+                    return conn.ExecuteScalar(sql, commandType: CommandType.Text);
+
+                return conn.ExecuteScalar(sql, param, commandType: CommandType.Text);
             }
         }
         #endregion
@@ -176,7 +188,7 @@ namespace Dapper.BaseRepository.Components
 
         public object QuerySybaseScalar(string procedureName, string connString, object? param = default)
         {
-            using (SqlConnection conn = new SqlConnection(connString))
+            using (AseConnection conn = new AseConnection(connString))
             {
                 conn.Open();
                 if (param == default)
