@@ -31,8 +31,8 @@ public class Customer
 public class AppRepository : BaseRepository<AppRepository>
 {
     /**
-        Run query without specifying the DbType and ConnectionString : Query will be executed <br>
-        on SqlServer and the connection string would be the connection setup from the DI <br>
+        Run query without specifying the DbType and ConnectionString : Query will be executed  
+        on SqlServer and the connection string would be the connection setup from the DI  
         container during application startup.
     */ 
     public async Task<CommandResp> AddCustomer(Customer customer)
