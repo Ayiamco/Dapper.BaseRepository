@@ -4,9 +4,9 @@ Dapper.BaseRepository is .netcore class library containing helper methods for ru
 ## Installation
 
 Run the following from your terminal or commandline.
-''''
+```
 dotnet add package Dapper.BaseRepository
-''''
+```
 
 ## Setup
 Default connections for any of the supported databases could be set during startup from the dependency injection container. If the default connection strings are not specified during start up helper methods with connection string as an argument should be used.
@@ -35,15 +35,15 @@ public class Program.cs
 
     app.Run();
 }
-
-
 ```
 
 ## Code Samples
 
-- When connection string is not passed during BaseRepository helper method call DefaultConnectionStrings set at  
-DI container would be used.
-- When DbType is not passed during BaseRepository helper method call will default to Microsoft SqlServer 
+- When connection string is not passed during BaseRepository helper method call, DefaultConnectionStrings set  
+at application startup would be used.
+- When DbType is not passed during BaseRepository helper method call, package will default to Microsoft SqlServer.
+- Query parameter objects must only contain properties used in the query.
+- If you want the package to log your errors and handle them gracefully pass inherit BaseRepository that has logger.
 
 ```
 using Dapper.BaseRepository.Components;
@@ -55,30 +55,47 @@ public class Customer
     public string Address {get; set;}
 }
 
+public class GetCustomerParam
+{
+    public int Skip {get;set;}
 
-public class AppRepository : BaseRepository<AppRepository>
+    public int Take {get;set;}
+
+    public string Name {get;set;}
+}
+
+
+public class AppRawSqlRepository : BaseRepository<AppRepository>
 {
     /**
-        Run command without specifying the DbType and ConnectionString : Query will be executed  
+        Run raw sql command without specifying the DbType and ConnectionString : command will be executed  
         on SqlServer and the connection string will be the DefaultSqlServerConnectionString setup from the DI  
         container during application startup.
     */ 
-    public async Task<CommandResp> AddCustomer(Customer customer)
+    public Task<CommandResp> AddCustomer(Customer customer)
     {
         var sql = $@" INSERT INTO Customers ( Name,Address) VALUES ( @Name,@Address)";
-        return await RunCommand(sql, customer);
-    }
-
-    public async Task<CommandResp> AddCustomer(Customer customer)
-    {
-        var sql = $@"Select Name,Address from Customers ( Name,Address) VALUES ( @Name,@Address)";
-        return await RunCommand(sql, customer);
+        return RunCommand(sql, customer);
     }
 
     /**
-        Run query on a specified DbType : Query will be executed  
-        on specified dbType and the connection string would be the connection setup from the DI  
+        Run raw sql query without specifying the DbType and ConnectionString : query will be executed  
+        on SqlServer and the connection string will be the DefaultSqlServerConnectionString setup from the DI  
         container during application startup.
+    */ 
+    public Task<IEnumerable<Customer>> GetCustomers(string name)
+    {
+        var sql = $@"
+            Select Name,Address from Customers  
+            Where Name like @Name
+        ";
+        return RunQuery<Customer>(sql, new { Name = name});
+    }
+
+    /**
+        Run raw sql command on a specified DbType : Command will be executed  
+        on specified dbType and the connection string would be the connection setup for  
+        that particular dbType at application startup.
     */ 
     public Task<CommandResp> AddCustomer(Customer customer)
     {
@@ -86,6 +103,23 @@ public class AppRepository : BaseRepository<AppRepository>
 
         //DbType is an enum of supported databases
         return RunCommand(sql, customer,DbType.Oracle);
+    }
+
+    /**
+        Run raw sql query on a specified DbType and connection : Command will be executed  
+        on specified dbType and the connection string would be the connection setup for  
+        that particular dbType at application startup.
+    */ 
+    public Task<IEnumerable<Customer>> GetCustomers(GetCustomerParam queryParam)
+    {
+        var connectionString ="A connection string";
+        var sql = $@"
+Select Name,Address from Customers  
+Where Name like @Name  
+ORDER BY Price  
+OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY
+        ";
+        return RunQuery<Customer>(sql, queryParam, connectionString, DbType.Sybase);
     }
 }
 ```
