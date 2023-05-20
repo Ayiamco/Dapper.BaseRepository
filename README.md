@@ -36,14 +36,15 @@ public class Program.cs
     app.Run();
 }
 ```
-
-## Code Samples
-
-- When connection string is not passed during BaseRepository helper method call, DefaultConnectionStrings set  
+#### Note:
+- When connection string is not passed during method call, DefaultConnectionStrings set
 at application startup would be used.
-- When DbType is not passed during BaseRepository helper method call, package will default to Microsoft SqlServer.
+- When DbType is not passed during method call, package will default to Microsoft SqlServer.
 - Query parameter objects must only contain properties used in the query.
 - If you want the package to log your errors and handle them gracefully pass inherit BaseRepository that has logger.
+- For Stored procedure output parameters add the corresponding SP attributes to the property.
+
+## Code Samples
 
 ```
 using Dapper.BaseRepository.Components;
