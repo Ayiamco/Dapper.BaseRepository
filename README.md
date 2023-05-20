@@ -69,9 +69,9 @@ public class GetCustomerParam
 public class AppRawSqlRepository : BaseRepository<AppRepository>
 {
     /**
-        Run raw sql command without specifying the DbType and ConnectionString : command will be executed  
-        on SqlServer and the connection string will be the DefaultSqlServerConnectionString setup from the DI  
-        container during application startup.
+        Run raw sql command without specifying the DbType and ConnectionString :  
+        command will be executed on SqlServer and the connection string will be  
+        the DefaultSqlServerConnectionString setup during application startup.  
     */ 
     public Task<CommandResp> AddCustomer(Customer customer)
     {
@@ -80,9 +80,9 @@ public class AppRawSqlRepository : BaseRepository<AppRepository>
     }
 
     /**
-        Run raw sql query without specifying the DbType and ConnectionString : query will be executed  
-        on SqlServer and the connection string will be the DefaultSqlServerConnectionString setup from the DI  
-        container during application startup.
+        Run raw sql query without specifying the DbType and ConnectionString :  
+        query will be executed on SqlServer and the connection string will be  
+        the DefaultSqlServerConnectionString setup during application startup. 
     */ 
     public Task<IEnumerable<Customer>> GetCustomers(string name)
     {
