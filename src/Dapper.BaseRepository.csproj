@@ -9,7 +9,7 @@
     <Title>Dapper helper functions for repository pattern.</Title>
     <Authors>Joseph Achonu</Authors>
     <Description>A package containing wrapper classes for dapper with SqlServer, Oracle and Sybase support.</Description>
-    <PackageProjectUrl>https://github.com/Ayiamco/Dapper.BaseRepository</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Ayiamco/Dapper.BaseRepository#dapper-baserepository</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Ayiamco/Dapper.BaseRepository</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>dapper,oracle,sybase,sqlserver</PackageTags>

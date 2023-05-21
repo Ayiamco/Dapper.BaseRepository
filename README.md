@@ -46,6 +46,7 @@ at application startup would be used.
 
 ## Code Samples
 
+#### Raw sql samples
 ```
 using Dapper.BaseRepository.Components;
 
@@ -66,7 +67,7 @@ public class GetCustomerParam
 }
 
 
-public class AppRawSqlRepository : BaseRepository<AppRepository>
+public class AppRawSqlRepository : [BaseRepository]("hjkhjk")<AppRepository>
 {
     /**
         Run raw sql command without specifying the DbType and ConnectionString :  
@@ -75,7 +76,7 @@ public class AppRawSqlRepository : BaseRepository<AppRepository>
     */ 
     public Task<CommandResp> AddCustomer(Customer customer)
     {
-        var sql = $@" INSERT INTO Customers ( Name,Address) VALUES ( @Name,@Address)";
+        var sql = $@"INSERT INTO Customers ( Name,Address) VALUES ( @Name,@Address)";
         return RunCommand(sql, customer);
     }
 
