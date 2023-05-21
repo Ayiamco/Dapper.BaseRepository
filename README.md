@@ -24,9 +24,9 @@ public class Program.cs
     //Default connection string setup : you only need to setup databases you'll be using
     builder.Services.AddBaseRepostiorySetup(options =>
     {
-        options.DefaultSqlServerConnectionString = "your default connection string for sql server database";
-        options.DefaultOracleConnectionString = "your default connection string for oracle database";
-        options.DefaultSybaseConnectionString = "your default connection string for sybase database";
+        options.DefaultSqlServerConnectionString = "";
+        options.DefaultOracleConnectionString = "";
+        options.DefaultSybaseConnectionString = "";
     });
 
     var app = builder.Build();
@@ -117,10 +117,10 @@ public class AppRawSqlRepository : BaseRepository<AppRepository>
     {
         var connectionString ="A connection string";
         var sql = $@"
-Select Name,Address from Customers  
-Where Name like @Name  
-ORDER BY Price  
-OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY
+            Select Name,Address from Customers  
+            Where Name like @Name  
+            ORDER BY Price  
+            OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY
         ";
         return RunQuery<Customer>(sql, queryParam, connectionString, DbType.Sybase);
     }
@@ -128,7 +128,7 @@ OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY
 ```
 
 #### Stored procedure code samples
-- For stored procedure output parameters add apply their corresponding SP attribute.  
+- For stored procedure output parameters, add apply their corresponding SP attribute.  
 [Here](https://github.com/Ayiamco/Dapper.BaseRepository/blob/master/src/Attributes/SpOutputAttributes.cs) is the file containing the Stored procedure output attributes.
 
 ```
@@ -167,7 +167,8 @@ public class AppStoredProcedureRepository : BaseRepository<AppRepository>
     public Task<CommandResp> AddCustomer(AddCustomerInputParam customerParam)
     {
         var storedOProcName = "TestProcedure";
-        return RunStoredProcedure<AddCustomerInputParam,AddCustomerOutputParam>(storedProcedure, customerParam);
+        return RunStoredProcedure<AddCustomerInputParam,AddCustomerOutputParam>(  
+            storedProcedure, customerParam);
     }
 }
 ```
