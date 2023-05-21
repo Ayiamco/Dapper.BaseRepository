@@ -37,6 +37,7 @@ public class Program.cs
 }
 ```
 #### Note:
+- Helper methods are gotten by inheriting the abstract class [BaseRespository](https://github.com/Ayiamco/Dapper.BaseRepository/blob/master/src/Components/BaseRepository.cs)  
 - When connection string is not passed during method call, DefaultConnectionStrings set
 at application startup would be used.
 - When DbType is not passed during method call, package will default to Microsoft SqlServer.
@@ -67,7 +68,7 @@ public class GetCustomerParam
 }
 
 
-public class AppRawSqlRepository : [BaseRepository]("hjkhjk")<AppRepository>
+public class AppRawSqlRepository : BaseRepository<AppRepository>
 {
     /**
         Run raw sql command without specifying the DbType and ConnectionString :  
@@ -122,6 +123,51 @@ ORDER BY Price
 OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY
         ";
         return RunQuery<Customer>(sql, queryParam, connectionString, DbType.Sybase);
+    }
+}
+```
+
+#### Stored procedure code samples
+- For stored procedure output parameters add apply their corresponding SP attribute.  
+[Here](https://github.com/Ayiamco/Dapper.BaseRepository/blob/master/src/Attributes/SpOutputAttributes.cs) is the file containing the Stored procedure output attributes.
+
+```
+using Dapper.BaseRepository.Components;
+
+public class Customer
+{
+    public string Name {get; set;}
+
+    public string Address {get; set;}
+}
+
+public class AddCustomerInputParam : AddCustomerOutputParam
+{
+    public string Address {get;set;}
+
+    public string Name {get;set;}
+}
+
+public class AddCustomerOutputParam
+{
+    [SpOutputInt]
+    public int ResponseCode {get;set;}
+
+    [SpOutputString(250)]
+    public int ErrorMessage {get;set;}
+}
+
+public class AppStoredProcedureRepository : BaseRepository<AppRepository>
+{
+    /**
+        Run stored proc command without specifying the DbType and ConnectionString :  
+        command will be executed on SqlServer and the connection string will be  
+        the DefaultSqlServerConnectionString setup during application startup.  
+    */ 
+    public Task<CommandResp> AddCustomer(AddCustomerInputParam customerParam)
+    {
+        var storedOProcName = "TestProcedure";
+        return RunStoredProcedure<AddCustomerInputParam,AddCustomerOutputParam>(storedProcedure, customerParam);
     }
 }
 ```
